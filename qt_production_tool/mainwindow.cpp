@@ -4,6 +4,7 @@
 #include "qpalette.h"
 #include "qcolor.h"
 #include "qdatetime.h"
+#include "jlink_tool.h"
 
 
 
@@ -12,17 +13,21 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     QFont font;
-
+    QPalette color;
 
     ui->setupUi(this);
 
     /*设置SN字体*/
-    font.setPointSize(28);
+    font.setPointSize(34);
     font.setFamily("Arial");
-
     ui->sn_display->setFont(font);
+
+    color.setColor(QPalette::Text,QColor("blue"));
+    ui->sn_display->setPalette(color);
+
     ui->sn_display->setText("DC1999988844411234567894");
     ui->sn_process_bar->setValue(100);
+
     /*设置日志字体*/
     font.setPointSize(12);
     ui->log_display->setFont(font);
@@ -63,7 +68,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_scan_tool_button_clicked()
 {
-    emit req_scan_tool();
+    emit req_jlink_tool(jlink_tool::JLINK_TOOL_SCAN,0);
 }
 
 /*当前时间*/
@@ -74,7 +79,7 @@ QString MainWindow::cur_time()
 }
 
 /*处理扫描工具结果*/
-void MainWindow::handle_jlink_tool_rsp(int rc,QString rsp)
+void MainWindow::handle_jlink_tool_rsp(int rsp,int rc,QString str)
 {
     if (rc == 0) {
         ui->log_display->setTextColor(QColor::fromRgb(0,0,0));
@@ -82,18 +87,25 @@ void MainWindow::handle_jlink_tool_rsp(int rc,QString rsp)
         ui->log_display->setTextColor(QColor::fromRgb(255,0,0));
     }
 
-    ui->log_display->append(rsp + cur_time());
+    if (rsp == jlink_tool::JLINK_TOOL_READ_SN && rc == 0) {
+
+        ui->log_display->append("读取SN：" + str + "成功！"+ cur_time());
+        ui->sn_display->setText(str);
+    } else {
+        ui->log_display->append(str + cur_time());
+    }
+
 
 }
 
 void MainWindow::on_read_sn_button_clicked()
 {
-
+    emit  req_jlink_tool(jlink_tool::JLINK_TOOL_READ_SN,0);
 }
 
 void MainWindow::on_write_sn_button_clicked()
 {
-
+    emit req_jlink_tool(jlink_tool::JLINK_TOOL_WRITE_SN,0);
 }
 
 void MainWindow::on_manual_exe_button_clicked()
@@ -133,4 +145,23 @@ void MainWindow::on_app_file_open_button_clicked()
     } else {
         file_dialog->close();
     }
+}
+
+void MainWindow::on_sn_edit_check_stateChanged(int arg1)
+{
+    if (ui->sn_edit_check->isChecked()) {
+        ui->sn_display->setReadOnly(false);
+    } else {
+        ui->sn_display->setReadOnly(true);
+    }
+}
+
+void MainWindow::on_sn_display_textChanged(const QString &arg1)
+{
+    emit req_jlink_tool(jlink_tool::JLINK_TOOL_OPEN_SN,ui->sn_display->text());
+}
+
+void MainWindow::on_log_display_textChanged()
+{
+    ui->log_display->moveCursor(QTextCursor::End);
 }

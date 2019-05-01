@@ -19,10 +19,9 @@ public:
     ~MainWindow();
 
 signals:
-    void req_scan_tool(void);
-    void req_show_file_dialog(void);
+    void req_jlink_tool(int,QString);
 public slots:
-    void handle_jlink_tool_rsp(int,QString);
+    void handle_jlink_tool_rsp(int,int,QString);
 
 private slots:
     void on_scan_tool_button_clicked();
@@ -36,6 +35,12 @@ private slots:
     void on_bootloader_file_open_button_clicked();
 
     void on_app_file_open_button_clicked();
+
+    void on_sn_edit_check_stateChanged(int arg1);
+
+    void on_sn_display_textChanged(const QString &arg1);
+
+    void on_log_display_textChanged();
 
 private:
     Ui::MainWindow *ui;

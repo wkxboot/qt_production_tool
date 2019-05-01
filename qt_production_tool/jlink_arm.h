@@ -135,9 +135,9 @@ int          JLINKARM_ReadDCC(uint32_t * pData, uint32_t NumItems, int TimeOut);
 void         JLINKARM_ReadDCCFast(uint32_t * pData, uint32_t NumItems);
 uint32_t     JLINKARM_ReadICEReg(int RegIndex);
 int          JLINKARM_ReadMem (uint32_t addr, uint32_t count, void * p);
-void         JLINKARM_ReadMemuint8_t (uint32_t Addr, uint32_t NumItems, uint8_t * pData, uint8_t* pStatus);
-void         JLINKARM_ReadMemuint16_t(uint32_t Addr, uint32_t NumItems, uint16_t* pData, uint8_t* pStatus);
-void         JLINKARM_ReadMemuint32_t(uint32_t Addr, uint32_t NumItems, uint32_t* pData, uint8_t* pStatus);
+void         JLINK_ReadMemU8 (uint32_t Addr, uint32_t NumItems, uint8_t * pData, uint8_t* pStatus);
+void         JLINK_ReadMemU16(uint32_t Addr, uint32_t NumItems, uint16_t* pData, uint8_t* pStatus);
+void         JLINK_ReadMemU32(uint32_t Addr, uint32_t NumItems, uint32_t* pData, uint8_t* pStatus);
 uint32_t     JLINKARM_ReadReg(ARM_REG RegIndex);
 void         JLINKARM_Reset(void);
 void         JLINKARM_ResetPullsTRST (uint8_t OnOff);
@@ -161,9 +161,9 @@ void         JLINKARM_WriteICEReg(int RegIndex, uint32_t Value, int AllowDelay);
 char         JLINKARM_WriteReg(ARM_REG RegIndex, uint32_t Data);
 void         JLINKARM_WriteMem(uint32_t addr, uint32_t count, const void * p);
 void         JLINKARM_WriteMemDelayed(uint32_t Addr, uint32_t Count, const void * p);
-void         JLINKARM_Writeuint8_t (uint32_t addr, uint8_t Data);
-void         JLINKARM_Writeuint16_t(uint32_t addr, uint16_t Data);
-void         JLINKARM_Writeuint32_t(uint32_t addr, uint32_t Data);
+void         JLINKARM_WriteU8 (uint32_t addr, uint8_t Data);
+void         JLINKARM_WriteU16(uint32_t addr, uint16_t Data);
+void         JLINKARM_WriteU32(uint32_t addr, uint32_t Data);
 
 /*********************************************************************
 *

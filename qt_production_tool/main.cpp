@@ -9,8 +9,8 @@ int main(int argc, char *argv[])
     MainWindow w;
     jlink_tool jtool;
 
-    QObject::connect(&w,SIGNAL(req_scan_tool(void)),&jtool,SLOT(handle_scan_tool_req(void)));
-    QObject::connect(&jtool,SIGNAL(jlink_tool_rsp(int,QString)),&w,SLOT(handle_jlink_tool_rsp(int,QString)));
+    QObject::connect(&w,SIGNAL(req_jlink_tool(int,QString)),&jtool,SLOT(handle_jlink_tool_req(int,QString)));
+    QObject::connect(&jtool,SIGNAL(jlink_tool_rsp(int,int,QString)),&w,SLOT(handle_jlink_tool_rsp(int,int,QString)));
     w.show();
     return a.exec();
 }

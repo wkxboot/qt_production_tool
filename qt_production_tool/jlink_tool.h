@@ -55,10 +55,14 @@ typedef void (*jlink_go_t)(void);
 typedef void (*jlink_clear_err_t)(void);
 
 /*jlink读MEM*/
-typedef void (*jlink_read_mem_t)(uint32_t,uint32_t,uint8_t *);
+typedef int (*jlink_read_mem_t)(uint32_t,uint32_t,uint8_t *);
 
 /*jlink写MEM*/
-typedef void (*jlink_write_mem_t)(uint32_t,uint32_t,uint8_t *);
+typedef int (*jlink_write_mem_t)(uint32_t,uint32_t,uint8_t *);
+
+/*jlink写MEM8*/
+typedef int (*jlink_write_mem8_t)(uint32_t,uint8_t);
+
 
 
 class jlink_tool : public QObject
@@ -66,6 +70,20 @@ class jlink_tool : public QObject
     Q_OBJECT
 public:
     explicit jlink_tool(QObject *parent = nullptr);
+
+    enum {
+        JLINK_TOOL_LOAD_DLL,
+        JLINK_TOOL_OPEN_SN,
+        JLINK_TOOL_OPEN_BOOTLOADER,
+        JLINK_TOOL_OPEN_APPLICATION,
+
+        JLINK_TOOL_SCAN,
+        JLINK_TOOL_CONNECT_DEVICE,
+        JLINK_TOOL_READ_SN,
+        JLINK_TOOL_WRITE_SN,
+        JLINK_TOOL_EXECUTE,
+    };
+
     jlink_open_t open;
     jlink_close_t close;
     jlink_get_sn_t get_sn;
@@ -84,13 +102,29 @@ public:
     jlink_is_opened_t is_opened;
     jlink_is_connected_t is_connected;
 
+    int scan(void);
+    int connect_device(void);
+
+    int open_sn(QString);
+    int open_bootloader(QString);
+    int open_application(QString);
+
+    int read_sn();
+    int write_sn(void);
+    int write_bootloader(void);
+    int write_application(void);
+    int execute();
+
 signals:
-    void jlink_tool_rsp(int,QString);
+    void jlink_tool_rsp(int,int,QString);
 public slots:
-    void handle_scan_tool_req();
+    void handle_jlink_tool_req(int,QString);
 
 private:
     bool inited;
+    QString bootloader_path;
+    QString application_path;
+    QString sn;
 };
 
 #endif // JLINK_TOOL_H

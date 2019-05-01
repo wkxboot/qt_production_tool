@@ -80,48 +80,183 @@ jlink_tool::jlink_tool(QObject *parent) : QObject(parent)
 
     } else {
         qDebug("load jlinkarm.dll err.\r\n");
-        emit jlink_tool_rsp(-1,"加载JLinkARM.dll失败！");
+        emit jlink_tool_rsp(JLINK_TOOL_LOAD_DLL,-1,"加载JLinkARM.dll失败！");
     }
 }
 
-
-
-void jlink_tool::handle_scan_tool_req()
+/*扫描jlink并打开，设置速度4000khz*/
+int jlink_tool::scan(void)
 {
-    int rc;
     uint32_t sn;
+
     /*jlink是否是打开和连接状态*/
     char *open_str;
     if (!is_opened()) {
         open_str = open();
-
         if (!is_opened()) {
-            rc = -1;
-            emit jlink_tool_rsp(-1,"打开jlink失败！");
-            return;
+            emit jlink_tool_rsp(JLINK_TOOL_SCAN, -1,"打开jlink失败！");
+            return -1;
         }
-        emit jlink_tool_rsp(0,"打开jlink成功！");
     }
+    emit jlink_tool_rsp(JLINK_TOOL_SCAN, 0,"打开jlink成功！");
 
     sn = get_sn();
-    emit jlink_tool_rsp(0,"JLINK-SN:" + QString::number(sn));
+    emit jlink_tool_rsp(JLINK_TOOL_SCAN,0,"JLINK-SN:" + QString::number(sn));
 
-    set_speed(2000);
-    emit jlink_tool_rsp(0,"设置频率2000Khz成功！");
+    set_speed(4000);
+    emit jlink_tool_rsp(JLINK_TOOL_SCAN,0,"设置频率4000Khz成功！");
+    return 0;
+}
 
-    rc = set_tif(1);
-    if (rc != 0) {
-        emit jlink_tool_rsp(-1,"设置SWD失败！");
-        return;
+/*连接设备特定STM32f103*/
+int jlink_tool::connect_device(void)
+{
+    int rc;
+    rc = is_connected();
+    if (rc ) {
+        emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"JLINK 是连接的！");
+    } else {
+       emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,-1,"JLINK 是断开的！");
     }
-    emit jlink_tool_rsp(0,"设置SWD成功！");
+
 
     rc = exe_cmd("Device = STM32F103C8",0,0);
     if (rc != 0) {
-        emit jlink_tool_rsp(-1,"选择芯片STM32F103C8失败！");
-        return;
+        emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,-1,"选择芯片STM32F103C8失败！");
+        return -1;
     }
-   emit jlink_tool_rsp(0,"选择芯片STM32F103C8成功！");
+   emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"选择芯片STM32F103C8成功！");
+
+    rc = set_tif(1);
+    if (rc != 0) {
+        emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,-1,"设置SWD模式失败！");
+        return -1;
+    }
+    emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"设置SWD模式成功！");
+
+    rc = is_connected();
+    if (rc ) {
+        emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"JLINK 是连接的！");
+    } else {
+       emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,-1,"JLINK 是断开的！");
+    }
+
+    return 0;
+}
+
+/*打开SN*/
+int jlink_tool::open_sn(QString str)
+{
+    sn = str;
+}
+
+
+/*打开bootloader*/
+int jlink_tool::open_bootloader(QString str)
+{
+    bootloader_path = str;
+}
+
+
+/*打开application*/
+int jlink_tool::open_application(QString str)
+{
+    application_path = str;
+}
+/*读取SN*/
+int jlink_tool::read_sn()
+{
+    int rc;
+    QString sn;
+    QByteArray *byte;
+    uint8_t sn_byte[25] = { 0 };
+
+    rc = connect_device();
+
+    if (rc != 0) {
+        return -1;
+    }
+    rc = read(0x20000000,24,sn_byte);
+    if (rc == 0) {
+        for (int i = 0;i < 24;i ++ ) {
+            qDebug("%d = %d",i,sn_byte[i]);
+        }
+    byte = new QByteArray((char *)sn_byte,24);
+    sn = QString::fromLocal8Bit(*byte);
+        emit jlink_tool_rsp(JLINK_TOOL_READ_SN,0,sn);
+        return 0;
+     }
+
+    return -1;
+}
+/*写入SN*/
+
+int jlink_tool::write_sn(void)
+{
+    int rc;
+    char *sn_str = "112233445566778899aabbcc";
+    if (sn.isEmpty()) {
+        emit jlink_tool_rsp(JLINK_TOOL_WRITE_SN,-1,"错误！SN为空！");
+        return -1;
+    }
+
+    if (sn.size() != 24) {
+        emit jlink_tool_rsp(JLINK_TOOL_WRITE_SN,-1,"错误！SN长度=" + QString::number(sn.size()) + "错误");
+        return -1;
+    }
+    rc = connect_device();
+
+    if (rc != 0) {
+        return -1;
+    }
+     rc = write(0x20000000,24,(uint8_t *)sn_str);
+
+
+    if (rc != 24) {
+        emit jlink_tool_rsp(JLINK_TOOL_WRITE_SN,-1,"写入SN：" + sn + "失败！");
+        return -1;
+     }
+    emit jlink_tool_rsp(JLINK_TOOL_WRITE_SN,0,"写入SN：" + sn + "成功！");
+    return 0;
+
+}
+/*执行自动化烧录*/
+int jlink_tool::execute()
+{
+
+}
+
+/*执行命令*/
+void jlink_tool::handle_jlink_tool_req(int req,QString str)
+{
+
+    switch (req) {
+    case JLINK_TOOL_SCAN:
+        scan();
+        break;
+    case JLINK_TOOL_READ_SN:
+        read_sn();
+        break;
+    case JLINK_TOOL_WRITE_SN:
+        write_sn();
+        break;
+    case JLINK_TOOL_OPEN_SN:
+        open_sn(str);
+        break;
+    case JLINK_TOOL_OPEN_BOOTLOADER:
+        open_bootloader(str);
+        break;
+    case JLINK_TOOL_OPEN_APPLICATION:
+        open_application(str);
+        break;
+
+    case JLINK_TOOL_EXECUTE:
+        execute();
+        break;
+
+    }
+
+
 }
 
 
