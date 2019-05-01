@@ -25,6 +25,20 @@ jlink_tool::jlink_tool(QObject *parent) : QObject(parent)
         set_speed = (jlink_set_speed_t) jlink_arm_dll.resolve("JLINKARM_SetSpeed");
         read = (jlink_read_mem_t) jlink_arm_dll.resolve("JLINKARM_ReadMem");
         write = (jlink_write_mem_t) jlink_arm_dll.resolve("JLINKARM_WriteMem");
+        halt = (jlink_halt_t) jlink_arm_dll.resolve("JLINKARM_Halt");
+
+        start_download = (jlink_start_download_t) jlink_arm_dll.resolve("JLINKARM_BeginDownload");
+        end_download = (jlink_end_download_t) jlink_arm_dll.resolve("JLINKARM_EndDownload");
+
+        if (!start_download) {
+            qDebug("reslove start_download err.\r\n");
+        }
+        if (!end_download) {
+            qDebug("reslove end_download err.\r\n");
+        }
+        if (!halt) {
+            qDebug("reslove halt err.\r\n");
+        }
 
         if (!open) {
             qDebug("reslove open err.\r\n");
@@ -98,6 +112,8 @@ int jlink_tool::scan(void)
             return -1;
         }
     }
+    qDebug(open_str);
+
     emit jlink_tool_rsp(JLINK_TOOL_SCAN, 0,"打开jlink成功！");
 
     sn = get_sn();
@@ -117,24 +133,34 @@ int jlink_tool::connect_device(void)
         emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"JLINK 是连接的！");
     } else {
        emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,-1,"JLINK 是断开的！");
+
+       rc = exe_cmd("Device = STM32F103C8",0,0);
+       if (rc != 0) {
+           emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,-1,"选择芯片STM32F103C8失败！");
+           return -1;
+       }
+       emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"选择芯片STM32F103C8成功！");
+
+       rc = set_tif(1);
+       if (rc != 0) {
+           emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,-1,"设置SWD模式失败！");
+           return -1;
+       }
+       emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"设置SWD模式成功！");
     }
 
+    reset();
+    emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,-1,"芯片复位成功！");
 
-    rc = exe_cmd("Device = STM32F103C8",0,0);
+    rc = halt();
     if (rc != 0) {
-        emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,-1,"选择芯片STM32F103C8失败！");
+       emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,-1,"芯片halt失败！");
         return -1;
     }
-   emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"选择芯片STM32F103C8成功！");
-
-    rc = set_tif(1);
-    if (rc != 0) {
-        emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,-1,"设置SWD模式失败！");
-        return -1;
-    }
-    emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"设置SWD模式成功！");
+    emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"芯片halt成功！");
 
     rc = is_connected();
+
     if (rc ) {
         emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"JLINK 是连接的！");
     } else {
@@ -176,7 +202,7 @@ int jlink_tool::read_sn()
     if (rc != 0) {
         return -1;
     }
-    rc = read(0x20000000,24,sn_byte);
+    rc = read(0x8000000,24,sn_byte);
     if (rc == 0) {
         for (int i = 0;i < 24;i ++ ) {
             qDebug("%d = %d",i,sn_byte[i]);
@@ -194,7 +220,7 @@ int jlink_tool::read_sn()
 int jlink_tool::write_sn(void)
 {
     int rc;
-    char *sn_str = "112233445566778899aabbcc";
+
     if (sn.isEmpty()) {
         emit jlink_tool_rsp(JLINK_TOOL_WRITE_SN,-1,"错误！SN为空！");
         return -1;
@@ -209,14 +235,21 @@ int jlink_tool::write_sn(void)
     if (rc != 0) {
         return -1;
     }
-     rc = write(0x20000000,24,(uint8_t *)sn_str);
+
+    rc = start_download();
+    qDebug("start down rc = %d",rc);
+    rc = write(0x8000000,256,(uint8_t *)sn.data());
 
 
-    if (rc != 24) {
+    if (rc != 256) {
         emit jlink_tool_rsp(JLINK_TOOL_WRITE_SN,-1,"写入SN：" + sn + "失败！");
         return -1;
      }
     emit jlink_tool_rsp(JLINK_TOOL_WRITE_SN,0,"写入SN：" + sn + "成功！");
+
+    rc = end_download();
+    qDebug("end down rc = %d",rc);
+
     return 0;
 
 }

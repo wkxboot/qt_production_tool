@@ -131,6 +131,8 @@ uint32_t     JLINKARM_GetSN(void);
 const char * JLINKARM_Open(void);
 void         JLINKARM_Unlock(void);
 int          JLINKARM_ExecCommand(char *,int,int);
+int          JLINKARM_BeginDownload(void);
+int          JLINKARM_EndDownload(void);
 int          JLINKARM_ReadDCC(uint32_t * pData, uint32_t NumItems, int TimeOut);
 void         JLINKARM_ReadDCCFast(uint32_t * pData, uint32_t NumItems);
 uint32_t     JLINKARM_ReadICEReg(int RegIndex);

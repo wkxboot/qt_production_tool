@@ -18,6 +18,8 @@ typedef int (*jlink_is_opened_t)(void);
 /*jlink是否连接*/
 typedef int (*jlink_is_connected_t)(void);
 
+
+
 /*jlink获取SN*/
 typedef uint32_t (*jlink_get_sn_t)(void);
 
@@ -42,6 +44,9 @@ typedef void (*jlink_unlock_t)(void);
 /*jlink复位芯片*/
 typedef void (*jlink_reset_t)(void);
 
+/*jlink暂停*/
+typedef int (*jlink_halt_t)(void);
+
 /*jlink解锁芯片*/
 typedef void (*jlink_unlock_t)(void);
 
@@ -63,6 +68,10 @@ typedef int (*jlink_write_mem_t)(uint32_t,uint32_t,uint8_t *);
 /*jlink写MEM8*/
 typedef int (*jlink_write_mem8_t)(uint32_t,uint8_t);
 
+/*开始下载*/
+typedef int (*jlink_start_download_t)(void);
+/*结束下载*/
+typedef int (*jlink_end_download_t)(void);
 
 
 class jlink_tool : public QObject
@@ -101,6 +110,10 @@ public:
     jlink_set_speed_t set_speed;
     jlink_is_opened_t is_opened;
     jlink_is_connected_t is_connected;
+    jlink_halt_t halt;
+    jlink_start_download_t start_download;
+    jlink_end_download_t end_download;
+
 
     int scan(void);
     int connect_device(void);
