@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>874</width>
-    <height>695</height>
+    <width>895</width>
+    <height>706</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>16777215</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>啤酒机板卡量产工具v0.0</string>
@@ -22,6 +34,12 @@
       <width>71</width>
       <height>51</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
     </property>
     <property name="font">
      <font>
@@ -54,7 +72,7 @@
      <string>bootloader引导程序</string>
     </property>
     <property name="checkable">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <widget class="QPushButton" name="bootloader_file_open_button">
      <property name="geometry">
@@ -113,7 +131,7 @@
       <string>地址（HEX）：</string>
      </property>
     </widget>
-    <widget class="QProgressBar" name="progressBar">
+    <widget class="QProgressBar" name="bootloader_process_bar">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -132,7 +150,7 @@
       <number>0</number>
      </property>
      <property name="value">
-      <number>100</number>
+      <number>0</number>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -217,7 +235,7 @@
      <rect>
       <x>30</x>
       <y>350</y>
-      <width>791</width>
+      <width>851</width>
       <height>221</height>
      </rect>
     </property>
@@ -260,7 +278,7 @@
      <string>应用程序</string>
     </property>
     <property name="checkable">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <widget class="QPushButton" name="app_file_open_button">
      <property name="geometry">
@@ -319,7 +337,7 @@
       <string>地址（HEX）：</string>
      </property>
     </widget>
-    <widget class="QProgressBar" name="progressBar_2">
+    <widget class="QProgressBar" name="application_process_bar">
      <property name="geometry">
       <rect>
        <x>10</x>
@@ -335,7 +353,7 @@
       </font>
      </property>
      <property name="value">
-      <number>50</number>
+      <number>0</number>
      </property>
     </widget>
     <widget class="QLabel" name="label_7">
@@ -416,7 +434,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>扫描JLINK和扫码枪</string>
+     <string>测试烧录工具</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_8">
@@ -569,13 +587,26 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QCheckBox" name="all_on_top_check_box">
+    <property name="geometry">
+     <rect>
+      <x>740</x>
+      <y>10</y>
+      <width>91</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>总在最前面</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>874</width>
+     <width>895</width>
      <height>23</height>
     </rect>
    </property>

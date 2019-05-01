@@ -4,7 +4,14 @@
 #include <QMainWindow>
 #include "qfiledialog.h"
 #include "qsettings.h"
-
+#include "qtimer.h"
+#include "qfont.h"
+#include "qpalette.h"
+#include "qcolor.h"
+#include "qdatetime.h"
+#include "QKeyEvent"
+#include "jlink_tool.h"
+#include "qmessagebox.h"
 
 namespace Ui {
 class MainWindow;
@@ -18,10 +25,15 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+protected:
+    void keyPressEvent(QKeyEvent *ev);
+    void keyReleaseEvent(QKeyEvent *ev);
+
 signals:
     void req_jlink_tool(int,QString);
 public slots:
     void handle_jlink_tool_rsp(int,int,QString);
+    void stop_scanner_timer(void);
 
 private slots:
     void on_scan_tool_button_clicked();
@@ -42,14 +54,22 @@ private slots:
 
     void on_log_display_textChanged();
 
+    void on_all_on_top_check_box_stateChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
     QString cur_time();
     QSettings *setting;
     QFileDialog *file_dialog;
     QString *bootloader_addr;
-    QString *app_addr;
+    QString *application_addr;
+    QTimer *scanner_timer;
+    bool is_scanner_input;
 
+    bool busy;
+    bool clear;
+    int success_cnt;
+    int fail_cnt;
 };
 
 #endif // MAINWINDOW_H

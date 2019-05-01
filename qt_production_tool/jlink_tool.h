@@ -79,9 +79,17 @@ class jlink_tool : public QObject
     Q_OBJECT
 public:
     explicit jlink_tool(QObject *parent = nullptr);
-
+    enum {
+        JLINK_TOOL_SN_SIZE = 24,
+        JLINK_TOOL_WRITE_SIZE = 1024,
+        JLINK_TOOL_READ_SIZE = 1024,
+        JLINK_TOOL_BOOTLOADER_ADDR = 0x08000000,
+        JLINK_TOOL_APPLICATION_ADDR = 0x08007800,
+        JLINK_TOOL_SERIAL_NO_ADDR = 0x0800F000,
+    };
     enum {
         JLINK_TOOL_LOAD_DLL,
+         JLINK_TOOL_INIT,
         JLINK_TOOL_OPEN_SN,
         JLINK_TOOL_OPEN_BOOTLOADER,
         JLINK_TOOL_OPEN_APPLICATION,
@@ -90,7 +98,11 @@ public:
         JLINK_TOOL_CONNECT_DEVICE,
         JLINK_TOOL_READ_SN,
         JLINK_TOOL_WRITE_SN,
-        JLINK_TOOL_EXECUTE,
+        JLINK_TOOL_WRITE_BOOTLOADER,
+        JLINK_TOOL_WRITE_APPLICATION,
+        JLINK_TOOL_AUTO_EXECUTE,
+        JLINK_TOOL_MANUAL_EXECUTE,
+        JLINK_TOOL_BUSY_STATUS,
     };
 
     jlink_open_t open;
@@ -117,7 +129,7 @@ public:
 
     int scan(void);
     int connect_device(void);
-
+    int open_jlink();
     int open_sn(QString);
     int open_bootloader(QString);
     int open_application(QString);
@@ -127,7 +139,8 @@ public:
     int write_bootloader(void);
     int write_application(void);
     int execute();
-
+    int manual_execute();
+    int auto_execute();
 signals:
     void jlink_tool_rsp(int,int,QString);
 public slots:
@@ -138,6 +151,11 @@ private:
     QString bootloader_path;
     QString application_path;
     QString sn;
+    QByteArray bootloader_bin;
+    int bootloader_crc;
+
+    QByteArray application_bin;
+    int application_crc;
 };
 
 #endif // JLINK_TOOL_H
