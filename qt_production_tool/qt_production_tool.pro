@@ -3,9 +3,15 @@
 # Project created by QtCreator 2019-04-30T10:10:26
 #
 #-------------------------------------------------
+VERSION = 1.0.0
+
+QMAKE_TARGET_PRODUCT = production tool
+QMAKE_TARGET_COMPANY = hongmei
+QMAKE_TARGET_DESCRIPTION = production tool
+QMAKE_TARGET_COPYRIGHT = 2019@copyright
 
 QT       += core gui
-
+QT       += sql
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = qt_bm_production_tool
@@ -26,12 +32,14 @@ CONFIG += c++11
 
 SOURCES += \
         abou_dialog.cpp \
+        data_base.cpp \
         jlink_tool.cpp \
         main.cpp \
         mainwindow.cpp
 
 HEADERS += \
         abou_dialog.h \
+        data_base.h \
         jlink_arm.h \
         jlink_tool.h \
         mainwindow.h

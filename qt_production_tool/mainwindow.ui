@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1361</width>
+    <width>1505</width>
     <height>692</height>
    </rect>
   </property>
@@ -616,13 +616,13 @@
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#00007f;&quot;&gt;烧写成功记录表&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#00007f;&quot;&gt;烧写成功记录&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QPushButton" name="query_today_button">
     <property name="geometry">
      <rect>
-      <x>1130</x>
+      <x>1180</x>
       <y>10</y>
       <width>101</width>
       <height>31</height>
@@ -635,14 +635,14 @@
    <widget class="QPushButton" name="query_day_button">
     <property name="geometry">
      <rect>
-      <x>1250</x>
+      <x>1300</x>
       <y>10</y>
       <width>101</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>查询其他时间</string>
+     <string>历史记录</string>
     </property>
    </widget>
    <widget class="QTableWidget" name="database_list">
@@ -650,9 +650,15 @@
      <rect>
       <x>980</x>
       <y>60</y>
-      <width>371</width>
+      <width>421</width>
       <height>561</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
     </property>
     <property name="defaultDropAction">
      <enum>Qt::IgnoreAction</enum>
@@ -678,7 +684,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1361</width>
+     <width>1505</width>
      <height>23</height>
     </rect>
    </property>

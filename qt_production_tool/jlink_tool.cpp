@@ -7,6 +7,8 @@
 jlink_tool::jlink_tool(QObject *parent) : QObject(parent)
 {
     int rc= -1;
+    device = new QString("STM32F103RC");
+
     QLibrary jlink_arm_dll("JLinkARM.dll");
     if (!jlink_arm_dll.load()) {
         emit emit jlink_tool_rsp(JLINK_TOOL_LOAD_DLL,-1,"加载JLinkARM.dll失败！");
@@ -151,12 +153,12 @@ int jlink_tool::connect_device(void)
         return -1;
     }
 
-    rc = exe_cmd("Device = STM32F103C8",0,0);
+    rc = exe_cmd("Device = STM32F103RC",0,0);
     if (rc != 0) {
-        emit emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,-1,"选择芯片STM32F103C8失败！");
+        emit emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,-1,"选择芯片失败！");
         return -1;
     }
-    emit emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"选择芯片STM32F103C8成功！");
+    emit emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"选择芯片成功！");
 
     rc = set_tif(1);
     if (rc != 0) {
@@ -488,9 +490,18 @@ exit:
     emit emit jlink_tool_rsp(JLINK_TOOL_MANUAL_EXECUTE,-1,"手动烧录失败！");
     return -1;
 }
+
+/*芯片运行程序*/
+int jlink_tool::start_go()
+{
+   set_pc(9,0x8000000);
+   go();
+   return 0;
+}
 /*执行命令*/
 void jlink_tool::handle_jlink_tool_req(int req,QString str)
 {
+    int rc = -1;
     if (!inited) {
        emit jlink_tool_rsp(JLINK_TOOL_INIT,0,"驱动初始化失败！");
        return ;
@@ -517,10 +528,16 @@ void jlink_tool::handle_jlink_tool_req(int req,QString str)
         break;
 
     case JLINK_TOOL_AUTO_EXECUTE:
-        auto_execute();
+        rc = auto_execute();
+        if (rc == 0) {
+            start_go();
+        }
         break;
     case JLINK_TOOL_MANUAL_EXECUTE:
-        manual_execute();
+        rc = manual_execute();
+        if (rc == 0) {
+            start_go();
+        }
         break;
     }
 

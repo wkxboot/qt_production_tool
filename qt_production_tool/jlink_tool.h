@@ -84,8 +84,8 @@ public:
         JLINK_TOOL_WRITE_SIZE = 1024,
         JLINK_TOOL_READ_SIZE = 1024,
         JLINK_TOOL_BOOTLOADER_ADDR = 0x08000000,
-        JLINK_TOOL_APPLICATION_ADDR = 0x08007800,
-        JLINK_TOOL_SERIAL_NO_ADDR = 0x0800F000,
+        JLINK_TOOL_APPLICATION_ADDR = 0x08007000,
+        JLINK_TOOL_SERIAL_NO_ADDR = 0x0803F800,
     };
     enum {
         JLINK_TOOL_LOAD_DLL,
@@ -141,6 +141,7 @@ public:
     int execute();
     int manual_execute();
     int auto_execute();
+    int start_go();
 signals:
     void jlink_tool_rsp(int,int,QString);
 public slots:
@@ -156,6 +157,7 @@ private:
 
     QByteArray application_bin;
     int application_crc;
+    QString *device;
 };
 
 #endif // JLINK_TOOL_H

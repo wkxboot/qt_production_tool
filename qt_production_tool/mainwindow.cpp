@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "abou_dialog.h"
-#include "qstandarditemmodel.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -63,18 +62,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(scanner_timer,SIGNAL(timeout()),this,SLOT(stop_scanner_timer()));
 
     /*数据表初始化*/
+    ui->database_list->setEditTriggers(QAbstractItemView::NoEditTriggers);/*不可编辑*/
     ui->database_list->setHorizontalHeaderItem(0,new QTableWidgetItem(tr("SN")));
     ui->database_list->setHorizontalHeaderItem(1,new QTableWidgetItem(tr("时间")));
-    ui->database_list->setRowCount(ui->database_list->rowCount() + 3);
-    ui->database_list->setItem(0,0,new QTableWidgetItem("888888888888888888"));
-    ui->database_list->setItem(0,1,new QTableWidgetItem("2012-9-12"));
-    ui->database_list->setItem(1,0,new QTableWidgetItem("666666666666666666"));
-    ui->database_list->setItem(1,1,new QTableWidgetItem("2012-9-13"));
-    ui->database_list->setItem(2,0,new QTableWidgetItem("111111111111111111"));
-    ui->database_list->setItem(2,1,new QTableWidgetItem("2012-9-11"));
+    ui->database_list->setRowCount(0);
 
-
-
+    /*数据库*/
+    record_data_base = new data_base();
 }
 
 MainWindow::~MainWindow()
@@ -145,6 +139,12 @@ void MainWindow::handle_jlink_tool_rsp(int rsp,int rc,QString str)
             success_cnt += 1;
             ui->success_cnt_display->setNum(success_cnt);
             ui->log_display->setTextColor(QColor::fromRgb(0,0,255));
+
+            /*插入数据库*/
+            record_data_base->insert(QDateTime::currentDateTime().toString("yyyy-MM-dd"),ui->sn_display->text(),QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss"));
+            /*自动更新今日列表显示*/
+            on_query_today_button_clicked();
+
         } else if (rc == - 1) {
             fail_cnt += 1;
             ui->fail_cnt_display->setNum(fail_cnt);
@@ -318,4 +318,51 @@ void MainWindow::on_actionabout_triggered()
     abou_Dialog about;
     about.setWindowTitle("关于");
     about.exec();
+}
+
+void MainWindow::on_query_today_button_clicked()
+{
+    QMap<QString,QString> record;
+    QTableWidgetItem *item;
+    QTableWidgetItem *item2;
+
+
+    ui->database_list->clearContents();
+    ui->database_list->setRowCount(0);
+
+    record = record_data_base->read(1);
+    QMap<QString,QString>::iterator i;
+    int index = 0;
+    for (i = record.begin();i != record.end(); i++) {
+        ui->database_list->setRowCount(ui->database_list->rowCount() + 1);
+        item = new QTableWidgetItem(i.key());
+        item2 = new QTableWidgetItem(i.value());
+        ui->database_list->setItem(index,0,item);
+        ui->database_list->setItem(index,1,item2);
+        index ++;
+
+    }
+}
+
+void MainWindow::on_query_day_button_clicked()
+{
+    QMap<QString,QString> record;
+    QTableWidgetItem *item;
+    QTableWidgetItem *item2;
+
+    ui->database_list->clearContents();
+    ui->database_list->setRowCount(0);
+
+    record = record_data_base->read(0);
+    QMap<QString,QString>::iterator i;
+    int index = 0;
+    for (i = record.begin();i != record.end(); i++) {
+        ui->database_list->setRowCount(ui->database_list->rowCount() + 1);
+        item = new QTableWidgetItem(i.key());
+        item2 = new QTableWidgetItem(i.value());
+        ui->database_list->setItem(index,0,item);
+        ui->database_list->setItem(index,1,item2);
+        index ++;
+
+    }
 }

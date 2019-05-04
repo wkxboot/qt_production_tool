@@ -12,6 +12,7 @@
 #include "QKeyEvent"
 #include "jlink_tool.h"
 #include "qmessagebox.h"
+#include "data_base.h"
 
 namespace Ui {
 class MainWindow;
@@ -58,9 +59,14 @@ private slots:
 
     void on_actionabout_triggered();
 
+    void on_query_today_button_clicked();
+
+    void on_query_day_button_clicked();
+
 private:
     Ui::MainWindow *ui;
     QString cur_time();
+    data_base *record_data_base;
     QSettings *setting;
     QFileDialog *file_dialog;
     QString *bootloader_addr;
