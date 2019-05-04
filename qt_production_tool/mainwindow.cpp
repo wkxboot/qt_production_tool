@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
-
+#include "abou_dialog.h"
+#include "qstandarditemmodel.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -61,6 +61,20 @@ MainWindow::MainWindow(QWidget *parent) :
     fail_cnt = 0;
 
     QObject::connect(scanner_timer,SIGNAL(timeout()),this,SLOT(stop_scanner_timer()));
+
+    /*数据表初始化*/
+    ui->database_list->setHorizontalHeaderItem(0,new QTableWidgetItem(tr("SN")));
+    ui->database_list->setHorizontalHeaderItem(1,new QTableWidgetItem(tr("时间")));
+    ui->database_list->setRowCount(ui->database_list->rowCount() + 3);
+    ui->database_list->setItem(0,0,new QTableWidgetItem("888888888888888888"));
+    ui->database_list->setItem(0,1,new QTableWidgetItem("2012-9-12"));
+    ui->database_list->setItem(1,0,new QTableWidgetItem("666666666666666666"));
+    ui->database_list->setItem(1,1,new QTableWidgetItem("2012-9-13"));
+    ui->database_list->setItem(2,0,new QTableWidgetItem("111111111111111111"));
+    ui->database_list->setItem(2,1,new QTableWidgetItem("2012-9-11"));
+
+
+
 }
 
 MainWindow::~MainWindow()
@@ -296,4 +310,12 @@ void MainWindow::on_all_on_top_check_box_stateChanged(int arg1)
         setWindowFlags(windowFlags() & ~Qt::WindowStaysOnTopHint);
     }
     this->show();
+}
+
+/*关于对话框*/
+void MainWindow::on_actionabout_triggered()
+{
+    abou_Dialog about;
+    about.setWindowTitle("关于");
+    about.exec();
 }

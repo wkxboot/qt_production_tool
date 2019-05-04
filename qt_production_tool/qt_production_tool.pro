@@ -25,16 +25,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        abou_dialog.cpp \
         jlink_tool.cpp \
         main.cpp \
         mainwindow.cpp
 
 HEADERS += \
+        abou_dialog.h \
         jlink_arm.h \
         jlink_tool.h \
         mainwindow.h
 
 FORMS += \
+        abou_dialog.ui \
         mainwindow.ui
 
 # Default rules for deployment.
