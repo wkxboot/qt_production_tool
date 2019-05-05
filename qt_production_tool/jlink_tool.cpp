@@ -307,20 +307,24 @@ int jlink_tool::write_sn(void)
     }
 
     start_download();
+    qDebug("start download sn...");
     rc = write(JLINK_TOOL_SERIAL_NO_ADDR,JLINK_TOOL_SN_SIZE,(uint8_t *)sn.toUtf8().data());
 
     if (rc != JLINK_TOOL_SN_SIZE) {
         rc = -1;
         goto exit;;
      }
-    emit emit jlink_tool_rsp(JLINK_TOOL_WRITE_SN,100,"写入SN：" + sn + "成功！");
 
-    end_download();
-    rc = 0;
+    rc = end_download();
 
 exit:
-    if (rc != 0) {
+
+    if (rc < 0) {
         emit emit jlink_tool_rsp(JLINK_TOOL_WRITE_SN,-1,"写入SN：" + sn + "失败！");
+    } else {
+        rc = 0;
+        qDebug("end download sn success.");
+        emit emit jlink_tool_rsp(JLINK_TOOL_WRITE_SN,100,"写入SN：" + sn + "成功！");
     }
 
     return rc;
@@ -344,23 +348,28 @@ int jlink_tool::write_bootloader()
         return -1;
     }
     start_download();
+    qDebug("start download bootloader...");
+
     while (write_total < bootloader_bin.size()) {
-    write_size = (JLINK_TOOL_WRITE_SIZE <= (bootloader_bin.size() - write_total) ? JLINK_TOOL_WRITE_SIZE : bootloader_bin.size() - write_total);
-    rc = write(JLINK_TOOL_BOOTLOADER_ADDR + write_total,write_size,(uint8_t*)(bootloader_bin.data() + write_total));
-    if (rc != write_size) {
-        rc = -1;
-        goto exit;
+        write_size = (JLINK_TOOL_WRITE_SIZE <= (bootloader_bin.size() - write_total) ? JLINK_TOOL_WRITE_SIZE : bootloader_bin.size() - write_total);
+        rc = write(JLINK_TOOL_BOOTLOADER_ADDR + write_total,write_size,(uint8_t*)(bootloader_bin.data() + write_total));
+        if (rc != write_size) {
+             rc = -1;
+             goto exit;
+         }
+        write_total += write_size;
+        percent = write_total*100 /bootloader_bin.size();
+        emit emit jlink_tool_rsp(JLINK_TOOL_WRITE_BOOTLOADER,percent,0);
     }
-    write_total += write_size;
-    percent = write_total*100 /bootloader_bin.size();
-    emit emit jlink_tool_rsp(JLINK_TOOL_WRITE_BOOTLOADER,percent,0);
-    }
-    rc = 0;
+    rc = end_download();
+
 exit:
-     end_download();
-     if (rc != 0) {
+     if (rc < 0) {
         emit emit jlink_tool_rsp(JLINK_TOOL_WRITE_BOOTLOADER,-1,"烧写bootloader失败！");
-     }
+     } else {
+        rc = 0;
+        qDebug("end download bootloader success.");
+    }
      return rc;
 }
 
@@ -381,23 +390,28 @@ int jlink_tool::write_application()
         return -1;
     }
     start_download();
+    qDebug("start download application...");
+
     while (write_total < application_bin.size()) {
-    write_size = (JLINK_TOOL_WRITE_SIZE <= (application_bin.size() - write_total) ? JLINK_TOOL_WRITE_SIZE : application_bin.size() - write_total);
-    rc = write(JLINK_TOOL_APPLICATION_ADDR + write_total,write_size,(uint8_t*)(application_bin.data() + write_total));
-    if (rc != write_size) {
-        rc = -1;
-        goto exit;
+        write_size = (JLINK_TOOL_WRITE_SIZE <= (application_bin.size() - write_total) ? JLINK_TOOL_WRITE_SIZE : application_bin.size() - write_total);
+        rc = write(JLINK_TOOL_APPLICATION_ADDR + write_total,write_size,(uint8_t*)(application_bin.data() + write_total));
+        if (rc != write_size) {
+            rc = -1;
+            goto exit;
+        }
+        write_total += write_size;
+        percent = write_total*100 /application_bin.size();
+        emit emit jlink_tool_rsp(JLINK_TOOL_WRITE_APPLICATION,percent,0);
     }
-    write_total += write_size;
-    percent = write_total*100 /application_bin.size();
-    emit emit jlink_tool_rsp(JLINK_TOOL_WRITE_APPLICATION,percent,0);
-    }
-    rc = 0;
+     rc = end_download();
 exit:
-     end_download();
-     if (rc != 0) {
+
+     if (rc < 0) {
         emit emit jlink_tool_rsp(JLINK_TOOL_WRITE_APPLICATION,-1,"烧写application失败！");
-     }
+     } else {
+        rc = 0;
+        qDebug("end download application success.");
+    }
      return rc;
 }
 

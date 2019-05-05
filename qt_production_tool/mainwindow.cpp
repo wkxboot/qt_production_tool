@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "abou_dialog.h"
+#include "about_dialog.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -315,7 +315,7 @@ void MainWindow::on_all_on_top_check_box_stateChanged(int arg1)
 /*关于对话框*/
 void MainWindow::on_actionabout_triggered()
 {
-    abou_Dialog about;
+    about_Dialog about;
     about.setWindowTitle("关于");
     about.exec();
 }
