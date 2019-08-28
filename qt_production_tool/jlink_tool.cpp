@@ -111,12 +111,13 @@ err:
 int jlink_tool::open_jlink()
 {
     /*jlink是否是打开和连接状态*/
+    if (is_opened()) {
+        close();
+    }
+    open();
     if (!is_opened()) {
-        open();
-        if (!is_opened()) {
-            emit emit jlink_tool_rsp(JLINK_TOOL_SCAN, -1,"打开jlink失败！");
-            return -1;
-        }
+        emit emit jlink_tool_rsp(JLINK_TOOL_SCAN, -1,"打开jlink失败！");
+        return -1;
     }
 
     emit emit jlink_tool_rsp(JLINK_TOOL_SCAN, 0,"打开jlink成功！");
