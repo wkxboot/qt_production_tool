@@ -137,9 +137,6 @@ int jlink_tool::scan(void)
     sn = get_sn();
     emit emit jlink_tool_rsp(JLINK_TOOL_SCAN,0,"JLINK-SN:" + QString::number(sn));
 
-    set_speed(4000);
-    emit emit jlink_tool_rsp(JLINK_TOOL_SCAN,0,"设置频率4000Khz成功！");
-
 
     return 0;
 }
@@ -168,6 +165,8 @@ int jlink_tool::connect_device(void)
     }
     emit emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"设置SWD模式成功！");
 
+    set_speed(4000);
+    emit emit jlink_tool_rsp(JLINK_TOOL_SCAN,0,"设置频率4000Khz成功！");
 
     reset();
     emit emit jlink_tool_rsp(JLINK_TOOL_CONNECT_DEVICE,0,"芯片复位成功！");

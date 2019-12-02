@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>啤酒机板卡量产工具v1.0.1</string>
+   <string>啤酒机板卡量产工具v1.0.2</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QLabel" name="label">
